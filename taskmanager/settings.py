@@ -1,7 +1,6 @@
-# taskmanager/settings.py
 from pathlib import Path
 import os
-import dj_database_url  # make sure installed: pip install dj-database-url
+import dj_database_url  # pip install dj-database-url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -12,10 +11,20 @@ if not SECRET_KEY:
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Get ALLOWED_HOSTS from env; fallback to empty list
+# Allowed hosts from env, fallback to Railway domain
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
-# Remove any empty strings in case someone left a trailing comma
 ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = ["web-production-dec07.up.railway.app"]
+
+# CSRF trusted origins (important for Railway HTTPS)
+CSRF_TRUSTED_ORIGINS = [
+    "https://web-production-dec07.up.railway.app"
+]
+
+# Secure cookies (only if Railway serves HTTPS, which it does)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 # ---------------------- APPS ----------------------
 INSTALLED_APPS = [
@@ -30,6 +39,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ Added for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -61,7 +71,9 @@ WSGI_APPLICATION = 'taskmanager.wsgi.application'
 # ---------------------- DATABASE ----------------------
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=True
     )
 }
 
@@ -83,6 +95,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'tasks' / 'static']
+
+# ✅ Use WhiteNoise for compressed static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ---------------------- AUTH REDIRECTS ----------------------
 LOGIN_URL = '/login/'

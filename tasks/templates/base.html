@@ -12,8 +12,9 @@
     <div class="header-inner container">
       <div class="brand-wrap">
         <a class="brand" href="{% url 'dashboard' %}">
-          <!-- small home SVG -->
-          <svg width="20" height="20" viewBox="0 0 24 24" style="vertical-align:middle; margin-right:8px" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M12 3l10 9h-3v9h-6v-6H11v6H5v-9H2z"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" style="vertical-align:middle; margin-right:8px" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M12 3l10 9h-3v9h-6v-6H11v6H5v-9H2z"/>
+          </svg>
           Task<span class="brand-accent">Manager</span>
         </a>
         <p class="brand-tag">Organize • Assign • Deliver</p>
@@ -49,9 +50,7 @@
         {% endif %}
       </div>
 
-      <button id="mobile-menu-btn" class="mobile-menu" aria-label="Toggle menu">
-        ☰
-      </button>
+      <button id="mobile-menu-btn" class="mobile-menu" aria-label="Toggle menu">☰</button>
     </div>
   </header>
 
@@ -67,55 +66,6 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- small JS: search/filter + mobile menu -->
-  <script>
-    (function(){
-      // Project search filter
-      const input = document.getElementById('project-search');
-      const clearBtn = document.getElementById('clear-search');
-
-      function filterProjects() {
-        const q = input.value.trim().toLowerCase();
-        const cards = document.querySelectorAll('.project-card');
-        cards.forEach(card => {
-          const title = (card.datasetTitle || card.getAttribute('data-title') || '').toLowerCase();
-          if (!q || title.includes(q)) {
-            card.style.display = '';
-            card.classList.remove('faded');
-          } else {
-            card.style.display = 'none';
-            card.classList.add('faded');
-          }
-        });
-      }
-
-      if (input) {
-        input.addEventListener('input', filterProjects);
-        clearBtn.addEventListener('click', function(e){ e.preventDefault(); input.value=''; filterProjects(); input.focus(); });
-
-        // focus search on pressing "/"
-        window.addEventListener('keydown', function(e){
-          if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            input.focus();
-          }
-        });
-      }
-
-      // Mobile menu toggle: collapse right controls into a dropdown on tiny screens
-      const mobileBtn = document.getElementById('mobile-menu-btn');
-      const headerInner = document.querySelector('.header-inner');
-      mobileBtn && mobileBtn.addEventListener('click', function(){
-        headerInner.classList.toggle('mobile-open');
-      });
-
-      // Attach dataTitle props for older browsers
-      document.querySelectorAll('.project-card').forEach(card=>{
-        if (!card.datasetTitle) {
-          card.datasetTitle = card.getAttribute('data-title') || (card.querySelector('h3') ? card.querySelector('h3').innerText : '');
-        }
-      });
-    })();
-  </script>
+  <script src="{% static 'tasks/script.js' %}"></script>
 </body>
 </html>
