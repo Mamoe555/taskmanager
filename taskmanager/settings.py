@@ -1,16 +1,23 @@
 # taskmanager/settings.py
 from pathlib import Path
 import os
-import dj_database_url  # make sure to install: pip install dj-database-url
+import dj_database_url  # make sure installed: pip install dj-database-url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")  # Render will override this
-DEBUG = os.environ.get("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+# ---------------------- SECURITY ----------------------
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable not set!")
 
-# Application definition
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+
+# Get ALLOWED_HOSTS from env; fallback to empty list
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+# Remove any empty strings in case someone left a trailing comma
+ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
+
+# ---------------------- APPS ----------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,14 +58,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'taskmanager.wsgi.application'
 
-# Database
+# ---------------------- DATABASE ----------------------
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
     )
 }
 
-# Password validation
+# ---------------------- PASSWORD VALIDATION ----------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -66,18 +73,18 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# ---------------------- INTERNATIONALIZATION ----------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# ---------------------- STATIC FILES ----------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # for collectstatic
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'tasks' / 'static']
 
-# Auth redirects
+# ---------------------- AUTH REDIRECTS ----------------------
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
