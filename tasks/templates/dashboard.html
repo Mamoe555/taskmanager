@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>
+    <!-- icon -->
+    <svg width="22" height="22" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:8px"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zM13 21h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+    Dashboard
+  </h2>
+
+  <p class="muted">Welcome back, <strong>{{ user.username }}</strong>!</p>
+
+  {% if is_admin %}
+    <p class="muted">Role: <strong>Admin</strong></p>
+  {% elif is_manager %}
+    <p class="muted">Role: <strong>Manager</strong></p>
+  {% else %}
+    <p class="muted">Role: <strong>User</strong></p>
+  {% endif %}
+
+  <div class="projects-list" id="projects-list">
+    {% for project in projects %}
+      <article class="project-card" data-title="{{ project.name|default:'' }}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <h3><a href="{% url 'project_detail' project.pk %}">{{ project.name }}</a></h3>
+          <div style="text-align:right">
+            <div class="muted" style="font-size:13px">Manager</div>
+            {% if project.manager %}
+              <div style="font-weight:700">{{ project.manager.username }}</div>
+            {% else %}
+              <div class="muted">—</div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if project.description %}
+          <p class="muted" style="margin-top:8px">{{ project.description }}</p>
+        {% endif %}
+
+        <div class="detail-row" style="margin-top:12px">
+          {% if project.created_at %}
+            <div class="muted">Created: {{ project.created_at|date:"Y-m-d" }}</div>
+          {% endif %}
+          <div class="muted">Tasks: {{ project.tasks.count }}</div>
+        </div>
+
+        {% if project.tasks.exists %}
+          <div style="margin-top:12px">
+            <strong>Tasks</strong>
+            <ul>
+              {% for task in project.tasks.all|slice:":3" %}
+                <li>
+                  <span style="font-weight:700">{{ task.title }}</span>
+                  <span class="muted"> — Assigned:
+                    {% if task.assigned_to %}
+                      {{ task.assigned_to.username }}
+                    {% else %}
+                      —
+                    {% endif %}
+                  </span>
+
+                  {% if task.status %}
+                    {% if task.status == "Done" %}
+                      <span class="status-badge done">{{ task.status }}</span>
+                    {% elif task.status == "In Progress" %}
+                      <span class="status-badge progress">{{ task.status }}</span>
+                    {% else %}
+                      <span class="status-badge todo">{{ task.status }}</span>
+                    {% endif %}
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+            {% if project.tasks.count > 3 %}
+              <div class="muted">and {{ project.tasks.count|add:"-3" }} more…</div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="muted" style="margin-top:12px">No tasks yet</div>
+        {% endif %}
+
+        <div style="margin-top:14px;display:flex;gap:12px;">
+          <a class="btn small ghost" href="{% url 'project_detail' project.pk %}">View</a>
+          {% if is_admin or is_manager %}
+            <a class="btn small" href="{% url 'create_task' project.pk %}">Add task</a>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <div class="project-card">
+        <p>No projects found. {% if is_admin or is_manager %}Create your first project with the button above.{% else %}Ask your manager to create one.{% endif %}</p>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
