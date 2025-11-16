@@ -1,8 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
-
 {% block content %}
-<div class="auth-form">
   <h2>Login</h2>
 
   {% if messages %}
@@ -16,28 +13,23 @@
   <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
     {{ form.non_field_errors }}
-
-    <div class="form-group">
-      <label for="{{ form.username.id_for_label }}">Username</label>
+    <div>
+      <label for="{{ form.username.id_for_label }}">Username</label><br>
       {{ form.username }}
     </div>
-
-    <div class="form-group">
-      <label for="{{ form.password.id_for_label }}">Password</label>
+    <div>
+      <label for="{{ form.password.id_for_label }}">Password</label><br>
       {{ form.password }}
     </div>
 
-    <div class="form-actions">
+    <div style="margin-top:12px;">
       <!-- Normal login -->
       <button type="submit" name="action" value="login" class="btn">Login</button>
 
-      <!-- Login as admin -->
-      <button type="submit" name="action" value="admin" class="btn ghost">Login as Admin</button>
+      <!-- Login as admin (same credentials but must be staff or in Admin group) -->
+      <button type="submit" name="action" value="admin" class="btn">Login as Admin</button>
     </div>
   </form>
 
-  <p class="form-prompt">
-    Don’t have an account? <a href="{% url 'register' %}">Register here</a>.
-  </p>
-</div>
+  <p style="margin-top:10px;">Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
 {% endblock %}

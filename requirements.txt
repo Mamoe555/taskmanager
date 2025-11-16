@@ -1,1 +1,10 @@
-Django==5.2.7gunicorn==23.0.0dj-database-url==3.0.1psycopg2-binary==2.9.11python-decouple==3.8# Optional packages you can add only if your project uses them:# numpy==1.25.2# pandas==2.3.2# Pillow==11.3.0
+asgiref==3.10.0
+Django==5.2.8
+gunicorn==23.0.0
+packaging==25.0
+pillow==12.0.0
+psycopg2-binary==2.9.11
+sqlparse==0.5.3
+tzdata==2025.2
+dj-database-url==2.1.0
+whitenoise==6.6.0
